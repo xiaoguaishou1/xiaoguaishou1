@@ -2,13 +2,14 @@
  * @Author: 阿喜
  * @Date: 2023-08-19 02:50:47
  * @LastEditors: panghu 760695955@qq.com
- * @LastEditTime: 2023-09-07 16:08:19
+ * @LastEditTime: 2023-09-09 00:49:48
  * @FilePath: \monster-resume\src\component\ProductHeader\Index.tsx
  * @Description:
  *
  */
+import { Application } from "@splinetool/runtime";
 import { Button, Descriptions, DescriptionsProps, Image, Timeline } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import imageUrl from "../../aseest/img.png";
 export default function Index() {
   const items: DescriptionsProps["items"] = [
@@ -45,13 +46,14 @@ export default function Index() {
   ];
   return (
     <div className="productHeader">
-      <Image
+      {/* <Image
         style={{ objectFit: "cover", borderRadius: "10px" }}
         src={imageUrl.src}
         preview={false}
         width={"80%"}
         height={320}
-      ></Image>
+      ></Image> */}
+      <App></App>
       <div
         style={{
           marginTop: "40px",
@@ -80,6 +82,59 @@ export default function Index() {
           ]}
         ></Timeline>
       </div>
+    </div>
+  );
+}
+
+import { useRef } from "react";
+import Spline from "@splinetool/react-spline";
+
+function App() {
+  function onLoad(spline: { findObjectByName: (arg0: string) => any }) {
+    const obj = spline.findObjectByName("Cube");
+    let lastScrollY = window.scrollY;
+    let isAtTop = true; // 用于跟踪是否在顶部
+    let animationFrameId: number;
+
+    function smoothScroll() {
+      const currentScrollY = window.scrollY;
+      if (obj) {
+        if (currentScrollY > lastScrollY) {
+          // 向下滚动
+          obj.position.y += 1;
+          isAtTop = false;
+        } else if (currentScrollY < lastScrollY) {
+          // 向上滚动
+          obj.position.y -= 1;
+        }
+
+        // 如果滚动到了顶部，重置Y轴位置
+        if (currentScrollY === 0 && !isAtTop) {
+          obj.position.y = 0;
+          isAtTop = true;
+        }
+
+        lastScrollY = currentScrollY;
+        console.log(obj, "obj");
+      }
+
+      animationFrameId = requestAnimationFrame(smoothScroll);
+    }
+
+    window.addEventListener("scroll", () => {
+      if (!animationFrameId) {
+        // 开始平滑滚动
+        smoothScroll();
+      }
+    });
+  }
+
+  return (
+    <div>
+      <Spline
+        scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"
+        onLoad={onLoad}
+      />
     </div>
   );
 }
